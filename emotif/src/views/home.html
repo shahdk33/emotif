@@ -4,7 +4,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="/favicon.ico" />
     <script src="https://cdn.tailwindcss.com"></script>
-  
     <link rel="stylesheet" type="text/css" href="/static/styles/custom.css" />
     <script
       src="https://res.cdn.office.net/teams-js/2.22.0/js/MicrosoftTeams.min.js"
@@ -17,55 +16,85 @@
 
   <body class="bg-gray-100 p-8">
     <div class="max-w-lg mx-auto bg-white rounded-lg p-6 shadow-lg">
-      <h1 class="text-4xl text-center font-bold text-blue-500 mb-4">Emotif</h1>
+      
+      <h1 class="text-4xl text-center font-bold text-gray-800 mb-4">Emotif</h1>
       <p class="text-center text-gray-600">Your AI friend</p>
 
       <!-- Emotion Buttons -->
       <div class="flex justify-center gap-4 my-4">
-        <button id="happy" class="emotion-button bg-yellow-300 hover:bg-yellow-400">Happy</button>
-        <button id="anxious" class="emotion-button bg-blue-300 hover:bg-blue-400">Anxious</button>
-        <button id="sad" class="emotion-button bg-gray-300 hover:bg-gray-400">Sad</button>
-        <button id="angry" class="emotion-button bg-red-300 hover:bg-red-400">Angry</button>
+        <button
+          id="happy"
+          class="emotion-button border border-black text-gray-800 py-2 px-4 rounded-full shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105"
+        >
+          Happy
+        </button>
+        <button
+          id="anxious"
+          class="emotion-button border border-black text-gray-800 py-2 px-4 rounded-full shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105"
+        >
+          Anxious
+        </button>
+        <button
+          id="sad"
+          class="emotion-button border border-black text-gray-800 py-2 px-4 rounded-full shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105"
+        >
+          Sad
+        </button>
+        <button
+          id="angry"
+          class="emotion-button border border-black text-gray-800 py-2 px-4 rounded-full shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105"
+        >
+          Angry
+        </button>
       </div>
 
       <!-- Slider for Percentage -->
-      <div id="sliderContainer" class="hidden" >
-        <label for="emotionSlider" class="block text-center text-gray-600 mb-2">How much do you feel?</label>
+      <div id="sliderContainer" class="hidden">
+        <label id="emotionLabel" for="emotionSlider" class="block text-center text-gray-600 mb-2">
+          How much do you feel?
+        </label>
         <input
           type="range"
           id="emotionSlider"
           min="0"
-          max="100"
-          value="50"
-          class="w-full"
+          max="5"
+          value="2"
+          step="0.5"
+          class="w-full border-black"
         />
-        <p id="percentageValue" class="text-center text-gray-600 mt-2">50%</p>
-        <button type="submit">submit</button>
+        <p id="percentageValue" class="text-center text-gray-600 mt-2">2</p>
+        <button type="submit">Submit</button>
       </div>
+      
     </div>
 
     <script>
       // Notify Microsoft Teams that the app has initialized
       microsoftTeams.appInitialization.notifySuccess();
 
-      // Emotion button click event handlers
-      const emotionButtons = document.querySelectorAll('.emotion-button');
-      emotionButtons.forEach(button => {
-        button.addEventListener('click', (event) => {
-          const emotion = event.target.id;
-          console.log('Selected emotion:', emotion);
+// Emotion button click event handlers
+const emotionButtons = document.querySelectorAll('.emotion-button');
+emotionButtons.forEach(button => {
+  button.addEventListener('click', (event) => {
+    const emotion = event.target.id; // Get the selected emotion (e.g., "happy", "sad")
+    console.log('Selected emotion:', emotion);
 
-          // Show slider after selecting an emotion
-          document.getElementById('sliderContainer').classList.remove('hidden');
-        });
-      });
+    // Update the label text dynamically
+    const emotionLabel = document.getElementById('emotionLabel');
+    emotionLabel.textContent = `How ${emotion} do you feel?`;
 
-      // Slider change event to update the percentage value
-      const slider = document.getElementById('emotionSlider');
-      const percentageValue = document.getElementById('percentageValue');
-      slider.addEventListener('input', () => {
-        percentageValue.textContent = `${slider.value}%`;
-      });
+    // Show slider after selecting an emotion
+    document.getElementById('sliderContainer').classList.remove('hidden');
+  });
+});
+
+// Slider change event to update the percentage value
+const slider = document.getElementById('emotionSlider');
+const percentageValue = document.getElementById('percentageValue');
+slider.addEventListener('input', () => {
+  percentageValue.textContent = `${slider.value}`;
+});
+
     </script>
 
     <script type="text/javascript">
