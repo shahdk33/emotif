@@ -16,12 +16,12 @@ app.use("/static", express.static(path.join(__dirname, "static")));
 // Adding tabs to our app. This will setup routes to various views
 // Setup home page
 app.get("/", (req, res) => {
-  send(req, path.join(__dirname, "views", "hello.html")).pipe(res);
+  send(req, path.join(__dirname, "views", "home.html")).pipe(res);
 });
 
 // Setup the static tab
 app.get("/tab", (req, res) => {
-  send(req, path.join(__dirname, "views", "hello.html")).pipe(res);
+  send(req, path.join(__dirname, "views", "home.html")).pipe(res);
 });
 
 // Create HTTP server
