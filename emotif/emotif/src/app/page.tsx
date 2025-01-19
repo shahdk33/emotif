@@ -1,13 +1,37 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Calendar from "./components/Calendar.js";
-import { connectFirebase, addEmotions } from "../../backend/firebase.js";
+import { connectFirebase, addEmotions, getEvents } from "../../backend/firebase.js";
 
 export default function Home() {
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [sliderValue, setSliderValue] = useState(2);
+  const [events, setEvents] = useState([]); // State to store events
+  const [suggestedActivities, setSuggestedActivities] = useState([]);
 
   const [db] = connectFirebase();
+
+  // Fetch events from Firebase
+  const fetchEvents = async () => {
+    const [db, dbRef] = connectFirebase(); // Initialize Firebase
+    try {
+      const eventsData = await getEvents(dbRef); // Get events from Firebase
+      console.log('Fetched Events:', eventsData); // Log events in console
+      if (eventsData !== "No data available") {
+        const parsedEvents = JSON.parse(eventsData); // Parse the events data
+        // Filter out any null events before setting state
+        const validEvents = parsedEvents.filter(event => event !== null);
+        setEvents(validEvents); // Update state with valid events
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error); // Handle errors
+    }
+  };
+
+  // Use effect to fetch events on component mount
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   const handleEmotionClick = (emotion) => {
     setSelectedEmotion(emotion);
@@ -17,7 +41,8 @@ export default function Home() {
     setSliderValue(event.target.value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    // Add emotion data to Firebase
     const emotionData = {
       date: new Date().toISOString().split("T")[0], // Current date
       time: new Date().toLocaleTimeString(), // Current time
@@ -26,6 +51,41 @@ export default function Home() {
     };
     addEmotions(db, emotionData);
     alert("Emotion submitted successfully!");
+
+    // Prepare data to send to askGemeni API
+    const data = {
+      events: events,
+      emotions: [{
+        date: emotionData.date,
+        emotion: emotionData.emotion,
+        level: emotionData.level,
+        time: emotionData.time
+      }]
+    };
+
+    // Make a POST request to askGemeni API
+    try {
+      const response = await fetch('/api/askGemeni', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      
+      console.log("RESULT", result)
+      if (response.ok) {
+        setSuggestedActivities(result.suggestedActivities); // Set suggested activities
+      } else {
+        alert('Error: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error calling askGemeni API:', error);
+    }
+
+    // Reset state
     setSelectedEmotion("");
     setSliderValue(2);
   };
@@ -111,6 +171,7 @@ export default function Home() {
       </div>
 
       <Calendar />
+
     </div>
   );
 }
