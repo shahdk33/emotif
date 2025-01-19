@@ -8,7 +8,6 @@ export default async function handler(req, res) {
     try {
       const genAI = new GoogleGenerativeAI("AIzaSyBeKx1KioTFlKyEWeR2pFTZSCmtE5SuJpk");  // Initialize Google Generative AI
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });  // Get the specific model
-
       const prompt = `Given the calendar events of a user:${JSON.stringify(events)} and their logged emotions for a day:${JSON.stringify(emotions)}, could you create suggestions for activities that the user could do in their free time that would make the user feel better? Specifically say what activity and the reason for suggesting that activity. Please provide your answer in the following format: [{"date": "", "endtime": "", "name": "AI suggested activity: ", "starttime": ""}]`;
 
       // Generate the response from the AI model

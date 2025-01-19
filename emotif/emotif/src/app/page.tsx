@@ -74,6 +74,7 @@ export default function Home() {
       });
 
       const result = await response.json();
+
       
       console.log("RESULT", result)
       if (response.ok) {
