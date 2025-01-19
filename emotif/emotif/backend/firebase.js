@@ -50,15 +50,18 @@ function getEmotions(dbRef){
       });
 }
 function getAievents(dbRef){
-    get(child(dbRef, `aievents/`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          return JSON.stringify(snapshot.val());
-        } else {
-          return "No data available";
-        }
-      }).catch((error) => {
-        return error;
-      });
+  return get(child(dbRef, `aievents/`)) // Return the promise directly
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        return snapshot.val(); // Return the data directly (no need to stringify)
+      } else {
+        return "No data available"; // Return a message if no data is available
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching AI events:", error); // Log the error
+      throw error; // Throw the error so it can be handled in the calling function
+    });
 }
 function addEmotions(db, emotion){
     // const emotion = {

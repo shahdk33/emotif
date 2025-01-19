@@ -1,19 +1,18 @@
 "use client"; 
 import { useState, useEffect } from "react";
 import Calendar from "./components/Calendar.js";
-import { connectFirebase, addEmotions, getEvents } from "../../backend/firebase.js";
+import { connectFirebase, addEmotions, getEvents, getAievents } from "../../backend/firebase.js";
 
 export default function Home() {
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [sliderValue, setSliderValue] = useState(2);
   const [events, setEvents] = useState([]); // State to store events
+  const [aievents, setAievents] = useState([]); // State to store AI events
   const [suggestedActivities, setSuggestedActivities] = useState([]);
-
-  const [db] = connectFirebase();
+  const [db, dbRef] = connectFirebase(); // Connect Firebase
 
   // Fetch events from Firebase
   const fetchEvents = async () => {
-    const [db, dbRef] = connectFirebase(); // Initialize Firebase
     try {
       const eventsData = await getEvents(dbRef); // Get events from Firebase
       console.log('Fetched Events:', eventsData); // Log events in console
@@ -28,17 +27,34 @@ export default function Home() {
     }
   };
 
+  // Fetch AI events from Firebase
+  const fetchAievents = async () => {
+    try {
+      const aieventsData = await getAievents(dbRef); // Fetch AI events from Firebase
+      console.log('Fetched AI Events:', aieventsData); // Log AI events in console
+      if (aieventsData !== "No data available") {
+        setAievents(aieventsData); // Update AI events state
+      }
+      const validAievents = aieventsData.filter(event => event !== null); // Remove null events
+      validAievents.forEach(event => {
+        // Alert with event details: name, date, starttime, and endtime
+        alert(`Emotif AI recommends you do "${event.name}" on ${event.date} from ${event.starttime} to ${event.endtime}`);
+      });    } catch (error) {
+      console.error('Error fetching AI events:', error); // Handle errors
+    }
+  };
+
   // Use effect to fetch events on component mount
   useEffect(() => {
-    fetchEvents();
+    fetchEvents(); // Fetch events when component mounts
   }, []);
 
   const handleEmotionClick = (emotion) => {
-    setSelectedEmotion(emotion);
+    setSelectedEmotion(emotion); // Set selected emotion
   };
 
   const handleSliderChange = (event) => {
-    setSliderValue(event.target.value);
+    setSliderValue(event.target.value); // Update slider value
   };
 
   const handleSubmit = async () => {
@@ -49,7 +65,7 @@ export default function Home() {
       emotion: selectedEmotion,
       level: sliderValue,
     };
-    addEmotions(db, emotionData);
+    addEmotions(db, emotionData); // Add emotion data to Firebase
     alert("Emotion submitted successfully!");
 
     // Prepare data to send to askGemeni API
@@ -74,9 +90,8 @@ export default function Home() {
       });
 
       const result = await response.json();
+      console.log("RESULT", result.suggestedActivities);
 
-      
-      console.log("RESULT", result)
       if (response.ok) {
         setSuggestedActivities(result.suggestedActivities); // Set suggested activities
       } else {
@@ -85,6 +100,9 @@ export default function Home() {
     } catch (error) {
       console.error('Error calling askGemeni API:', error);
     }
+
+    // Fetch and log AI events from Firebase after submission
+    fetchAievents();
 
     // Reset state
     setSelectedEmotion("");
@@ -100,26 +118,25 @@ export default function Home() {
         <p className="text-center text-gray-600">Your AI friend</p>
         {/* Emotion Buttons */}
         <div className="flex justify-center gap-4 my-4">
-        {["happy", "anxious", "confident", "angry"].map((emotion) => (
-          <div key={emotion} className="flex flex-col items-center">
-            {/* Emotion Icon above the button */}
-            <img
-              src={`/emoji/${emotion}-icon.png`} // Corrected relative path for the emoji icon
-              alt={emotion}
-              className="w-32 h-32 mb-4" // Adjust the size of the icon (larger)
-            />
-            
-            {/* Emotion Button */}
-            <button
-              onClick={() => handleEmotionClick(emotion)}
-              className="emotion-button border border-black text-gray-800 py-3 px-6 rounded-full shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105"
-            >
-            {/* Emotion Label */}
+          {["happy", "anxious", "confident", "angry"].map((emotion) => (
+            <div key={emotion} className="flex flex-col items-center">
+              {/* Emotion Icon above the button */}
+              <img
+                src={`/emoji/${emotion}-icon.png`} // Corrected relative path for the emoji icon
+                alt={emotion}
+                className="w-32 h-32 mb-4" // Adjust the size of the icon (larger)
+              />
+              {/* Emotion Button */}
+              <button
+                onClick={() => handleEmotionClick(emotion)}
+                className="emotion-button border border-black text-gray-800 py-3 px-6 rounded-full shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105"
+              >
+                {/* Emotion Label */}
                 <span className="text-sm">{emotion.charAt(0).toUpperCase() + emotion.slice(1)}</span>
-                </button>
-                </div>
-              ))}
-          </div>
+              </button>
+            </div>
+          ))}
+        </div>
 
         {/* Slider for Percentage */}
         {selectedEmotion && (
