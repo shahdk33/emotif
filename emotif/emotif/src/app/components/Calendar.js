@@ -34,7 +34,9 @@ const Calendar = () => {
         console.log('Fetched Events:', eventsData); // Log events in console
         if (eventsData !== "No data available") {
           const parsedEvents = JSON.parse(eventsData); // Parse the events data
-          setEvents(parsedEvents); // Update state with events
+          // Filter out any null events before setting state
+          const validEvents = parsedEvents.filter(event => event !== null);
+          setEvents(validEvents); // Update state with valid events
         }
       } catch (error) {
         console.error('Error fetching events:', error); // Handle errors
@@ -44,16 +46,28 @@ const Calendar = () => {
     fetchEvents();
   }, [currentDate]); // Re-fetch events when currentDate changes
 
+  // Helper function to convert 'DD-MM-YYYY' format into a Date object
+  const parseDate = (dateString) => {
+    const [day, month, year] = dateString.split('-');
+    return new Date(`${month}-${day}-${year}`);
+  };
+
   // Helper function to check if an event falls within a specific time slot
   const getEventForTimeSlot = (eventDate, hour) => {
-    const eventStart = new Date(eventDate.starttime); // Assume starttime is a valid timestamp
-    const eventEnd = new Date(eventDate.endtime); // Assume endtime is a valid timestamp
+    const eventStart = eventDate.starttime;
+    const eventEnd = eventDate.endtime;
 
-    return (
-      eventStart.getHours() <= hour.getHours() &&
-      eventEnd.getHours() > hour.getHours() &&
-      format(eventStart, 'yyyy-MM-dd') === format(eventDate.date, 'yyyy-MM-dd')
-    );
+    const [eventStartHour, eventStartMinute] = eventStart.split(':').map(num => parseInt(num));
+    const [eventEndHour, eventEndMinute] = eventEnd.split(':').map(num => parseInt(num));
+    const hourStart = setHours(setMinutes(new Date(), 0), hour); // Start of the hour
+    const hourEnd = setHours(setMinutes(new Date(), 59), hour); // End of the hour
+
+    // Convert event start and end to date objects
+    const eventStartTime = setMinutes(setHours(new Date(), eventStartHour), eventStartMinute);
+    const eventEndTime = setMinutes(setHours(new Date(), eventEndHour), eventEndMinute);
+
+    // Check if the event is within the current hour slot
+    return (eventStartTime < hourEnd && eventEndTime > hourStart);
   };
 
   return (
@@ -105,16 +119,20 @@ const Calendar = () => {
                 className="bg-white p-2 border-t border-r border-gray-300 hover:bg-gray-100 cursor-pointer"
               >
                 {/* Render events in the appropriate time slot */}
-                {/* {events
-                  .filter(event =>
-                    getEventForTimeSlot(event, hour) &&
-                    format(day, 'yyyy-MM-dd') === format(event.date, 'yyyy-MM-dd')
-                  )
+                {events
+                  .filter(event => {
+                    const eventDate = parseDate(event.date); // Convert event.date string to Date object
+                    return format(eventDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd') &&
+                      getEventForTimeSlot(event, hour.getHours()); // Check if event is in current hour
+                  })
                   .map((event, eventIndex) => (
-                    <div key={eventIndex} className="text-xs text-blue-600 font-semibold">
-                      {event.name} ({format(new Date(event.starttime), 'h:mm a')})
+                    <div key={eventIndex} className="text-sm font-semibold text-blue-500">
+                      {event.name}
+                      <div className="text-xs text-gray-500">
+                        {event.starttime} - {event.endtime}
+                      </div>
                     </div>
-                  ))} */}
+                  ))}
               </div>
             ))}
           </React.Fragment>
