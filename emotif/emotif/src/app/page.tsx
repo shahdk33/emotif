@@ -97,19 +97,29 @@ export default function Home() {
           Emotif
         </h1>
         <p className="text-center text-gray-600">Your AI friend</p>
-
         {/* Emotion Buttons */}
         <div className="flex justify-center gap-4 my-4">
-          {["happy", "anxious", "sad", "angry"].map((emotion) => (
+        {["happy", "anxious", "confident", "angry"].map((emotion) => (
+          <div key={emotion} className="flex flex-col items-center">
+            {/* Emotion Icon above the button */}
+            <img
+              src={/emoji/${emotion}-icon.png} // Correct relative path for the emoji icon
+              alt={emotion}
+              className="w-32 h-32 mb-4" // 4 times bigger image size (128px)// Adjust the size of the icon (larger)
+            />
+            
+            {/* Emotion Button */}
             <button
-              key={emotion}
               onClick={() => handleEmotionClick(emotion)}
-              className="emotion-button border border-black text-gray-800 py-2 px-4 rounded-full shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105"
+              className="emotion-button border border-black text-gray-800 py-3 px-6 rounded-full shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105"
             >
-              {emotion.charAt(0).toUpperCase() + emotion.slice(1)}
-            </button>
-          ))}
-        </div>
+            {/* Emotion Label */}
+                <span className="text-sm">{emotion.charAt(0).toUpperCase() + emotion.slice(1)}</span>
+                </button>
+                </div>
+              ))}
+          </div>
+
 
         {/* Slider for Percentage */}
         {selectedEmotion && (
