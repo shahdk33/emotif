@@ -85,7 +85,7 @@ function addEvents(db,event){
     
 }
 function addAievents(db,aievent){
-    // const aievent = {
+    // const aievent = {a
     //     "date": "20-01-2025",
     //     "endtime": "19:00",
     //     "name": "AI suggestion: go for walk",
