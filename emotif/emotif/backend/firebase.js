@@ -23,17 +23,21 @@ function connectFirebase() {
     return [db,dbRef];
   }
 
-function getEvents(dbRef){
-    get(child(dbRef, `events/`)).then((snapshot) => {
+  function getEvents(dbRef) {
+    return get(child(dbRef, `events/`)) // Return the promise from `get`
+      .then((snapshot) => {
         if (snapshot.exists()) {
-          return JSON.stringify(snapshot.val());
+          return JSON.stringify(snapshot.val()); // Return the data if exists
         } else {
-          return "No data available";
+          return "No data available"; // Return a message if no data is available
         }
-      }).catch((error) => {
-        return error;
+      })
+      .catch((error) => {
+        console.error("Error fetching events:", error); // Log the error
+        return error; // Return the error message
       });
-}
+  }
+  
 function getEmotions(dbRef){
     get(child(dbRef, `emotions/`)).then((snapshot) => {
         if (snapshot.exists()) {
@@ -92,3 +96,12 @@ function addAievents(db,aievent){
     set(newAievents, aievent);
     
 }
+module.exports = {
+  connectFirebase,
+  getEvents,
+  getEmotions,
+  getAievents,
+  addEmotions,
+  addEvents,
+  addAievents
+};

@@ -1,10 +1,13 @@
 "use client";
 import { useState } from "react";
 import Calendar from "./components/Calendar.js";
+import { connectFirebase, addEmotions } from "../../backend/firebase.js";
 
 export default function Home() {
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [sliderValue, setSliderValue] = useState(2);
+
+  const [db] = connectFirebase();
 
   const handleEmotionClick = (emotion) => {
     setSelectedEmotion(emotion);
@@ -12,6 +15,19 @@ export default function Home() {
 
   const handleSliderChange = (event) => {
     setSliderValue(event.target.value);
+  };
+
+  const handleSubmit = () => {
+    const emotionData = {
+      date: new Date().toISOString().split("T")[0], // Current date
+      time: new Date().toLocaleTimeString(), // Current time
+      emotion: selectedEmotion,
+      level: sliderValue,
+    };
+    addEmotions(db, emotionData);
+    alert("Emotion submitted successfully!");
+    setSelectedEmotion("");
+    setSliderValue(2);
   };
 
   return (
@@ -85,6 +101,7 @@ export default function Home() {
             {/* Submit Button */}
             <button
               type="submit"
+              onClick={handleSubmit}
               className="bg-black text-white py-2 px-4 rounded-full hover:bg-gray-800 transition-colors mt-4"
             >
               Submit
