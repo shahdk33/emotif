@@ -1,4 +1,4 @@
-"use client";
+"use client"; 
 import { useState, useEffect } from "react";
 import Calendar from "./components/Calendar.js";
 import { connectFirebase, addEmotions, getEvents } from "../../backend/firebase.js";
@@ -103,9 +103,9 @@ export default function Home() {
           <div key={emotion} className="flex flex-col items-center">
             {/* Emotion Icon above the button */}
             <img
-              src={/emoji/${emotion}-icon.png} // Correct relative path for the emoji icon
+              src={`/emoji/${emotion}-icon.png`} // Corrected relative path for the emoji icon
               alt={emotion}
-              className="w-32 h-32 mb-4" // 4 times bigger image size (128px)// Adjust the size of the icon (larger)
+              className="w-32 h-32 mb-4" // Adjust the size of the icon (larger)
             />
             
             {/* Emotion Button */}
@@ -119,7 +119,6 @@ export default function Home() {
                 </div>
               ))}
           </div>
-
 
         {/* Slider for Percentage */}
         {selectedEmotion && (
@@ -181,7 +180,6 @@ export default function Home() {
       </div>
 
       <Calendar />
-
     </div>
   );
 }
