@@ -9,6 +9,12 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+package-lock.json
+package.json
+tsconfig.json
+tailwind.config.ts
+next.config.ts
+postcss.config.mjs
 
 # testing
 /coverage

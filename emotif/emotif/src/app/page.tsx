@@ -41,6 +41,7 @@ export default function Home() {
         alert(`Emotif AI recommends you do "${event.name}" on ${event.date} from ${event.starttime} to ${event.endtime}`);
       });    } catch (error) {
       console.error('Error fetching AI events:', error); // Handle errors
+
     }
   };
 
@@ -110,15 +111,15 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-gray-100 p-8">
-      <div className="max-w-lg mx-auto bg-white rounded-lg p-6 shadow-lg">
+    <div className="bg-gray-100 p-6">
+      <div className="mx-auto bg-white rounded-lg p-6 shadow-lg w-100">
         <h1 className="text-4xl text-center font-bold text-gray-800 mb-4">
           Emotif
         </h1>
-        <p className="text-center text-gray-600">Your AI friend</p>
+        <p className="text-center text-gray-600">How </p>
         {/* Emotion Buttons */}
-        <div className="flex justify-center gap-4 my-4">
-          {["happy", "anxious", "confident", "angry"].map((emotion) => (
+        <div className="flex justify-center gap-2 my-6">
+          {["happy", "anxious", "confident", "angry", "tired"].map((emotion) => (
             <div key={emotion} className="flex flex-col items-center">
               {/* Emotion Icon above the button */}
               <img
@@ -129,7 +130,7 @@ export default function Home() {
               {/* Emotion Button */}
               <button
                 onClick={() => handleEmotionClick(emotion)}
-                className="emotion-button border border-black text-gray-800 py-3 px-6 rounded-full shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105"
+                className=" emotion-button border border-black text-gray-800 py-1 px-6 rounded-full shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105"
               >
                 {/* Emotion Label */}
                 <span className="text-sm">{emotion.charAt(0).toUpperCase() + emotion.slice(1)}</span>
@@ -140,7 +141,7 @@ export default function Home() {
 
         {/* Slider for Percentage */}
         {selectedEmotion && (
-          <div id="sliderContainer" className="flex flex-col items-center">
+          <div id="sliderContainer" className="max-w-lg flex flex-col items-center justify-center m-auto ">
             <label
               id="emotionLabel"
               htmlFor="emotionSlider"
