@@ -116,7 +116,7 @@ export default function Home() {
         <h1 className="text-4xl text-center font-bold text-gray-800 mb-4">
           Emotif
         </h1>
-        <p className="text-center text-gray-600">How </p>
+        <p className="text-center text-gray-600">HOW ARE YOU FEELING RIGHT NOW? </p>
         {/* Emotion Buttons */}
         <div className="flex justify-center gap-2 my-6">
           {["happy", "anxious", "confident", "angry", "tired"].map((emotion) => (

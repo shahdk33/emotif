@@ -38,8 +38,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 
 
-## need to install 
+## to install 
 
 npm install axios
 npm install firebase
 npm install @google/generative-ai
+
+## to run
+npm run dev

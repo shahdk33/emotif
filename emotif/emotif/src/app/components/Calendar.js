@@ -21,7 +21,7 @@ const Calendar = () => {
 
   const daysOfWeek = eachDayOfInterval({ start: startOfCurrentWeek, end: endOfCurrentWeek });
   const hoursInDay = eachHourOfInterval({
-    start: setMinutes(setHours(new Date(), 0), 0),
+    start: setMinutes(setHours(new Date(), 8), 0),
     end: setMinutes(setHours(new Date(), 23), 59),
   });
 
