@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Calendar from "./components/Calendar.js";
 import { motion, AnimatePresence } from "framer-motion"; // Import animation library
+import { connectFirebase, addEmotions, getEvents, getAievents } from "../../backend/firebase.js";
 
 export default function Home() {
   const emotionLevels = ["Very minimal", "Just a bit", "Moderate", "Very", "Extremely"];
@@ -9,16 +10,109 @@ export default function Home() {
   const [sliderValue, setSliderValue] = useState(2);
   const [isVisible, setIsVisible] = useState(false); // Controls Emotif Bar visibility
   const [isModalOpen, setIsModalOpen] = useState(false); // Controls pop-up modal visibility
+  const [events, setEvents] = useState([]); // State to store events
+  const [aievents, setAievents] = useState([]); // State to store AI events
+  const [db, dbRef] = connectFirebase(); // Connect Firebase
+  const [suggestedActivities, setSuggestedActivities] = useState([]);
+  const [modalMessage, setModalMessage] = useState("");
 
   // Toggle Emotif Bar visibility
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
   };
 
-  // Function to show the modal
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    // Add emotion data to Firebase
+    const emotionData = {
+      date: new Date().toISOString().split("T")[0], // Current date
+      time: new Date().toLocaleTimeString(), // Current time
+      emotion: selectedEmotion,
+      level: sliderValue,
+    };
+    addEmotions(db, emotionData); // Add emotion data to Firebase
+    setModalMessage("Emotion submitted successfully!");
     setIsModalOpen(true);
+
+    // Prepare data to send to askGemeni API
+    const data = {
+      events: events,
+      emotions: [{
+        date: emotionData.date,
+        emotion: emotionData.emotion,
+        level: emotionData.level,
+        time: emotionData.time
+      }]
+    };
+
+    // Make a POST request to askGemeni API
+    try {
+      const response = await fetch('/api/askGemeni', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      console.log("RESULT", result.suggestedActivities);
+
+      if (response.ok) {
+        setSuggestedActivities(result.suggestedActivities); // Set suggested activities        setSuggestedActivities(result.suggestedActivities); // Set suggested activities
+      } else {
+        setModalMessage('Error: ' + result.error);
+        setIsModalOpen(true);
+      }
+    } catch (error) {
+      console.error('Error calling askGemeni API:', error);
+    }
+
+    // Fetch and log AI events from Firebase after submission
+    fetchAievents();
+
+    // Reset state
+    setSelectedEmotion("");
+    setSliderValue(2);
   };
+
+  // Fetch events from Firebase
+  const fetchEvents = async () => {
+    try {
+      const eventsData = await getEvents(dbRef); // Get events from Firebase
+      console.log('Fetched Events:', eventsData); // Log events in console
+      if (eventsData !== "No data available") {
+        const parsedEvents = JSON.parse(eventsData); // Parse the events data
+        // Filter out any null events before setting state
+        const validEvents = parsedEvents.filter(event => event !== null);
+        setEvents(validEvents); // Update state with valid events
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error); // Handle errors
+    }
+  };
+
+  // Fetch AI events from Firebase
+  const fetchAievents = async () => {
+    try {
+      const aieventsData = await getAievents(dbRef); // Fetch AI events from Firebase
+      console.log('Fetched AI Events:', aieventsData); // Log AI events in console
+      if (aieventsData !== "No data available") {
+        setAievents(aieventsData); // Update AI events state
+      }
+      const validAievents = aieventsData.filter(event => event !== null); // Remove null events
+      validAievents.forEach(event => {
+        // Alert with event details: name, date, starttime, and endtime
+        setModalMessage(`Emotif AI recommends you do "${event.name}" on ${event.date} from ${event.starttime} to ${event.endtime}`);
+        setIsModalOpen(true);
+      });    } catch (error) {
+      console.error('Error fetching AI events:', error); // Handle errors
+
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents(); // Fetch events when component mounts
+  }, []);
 
   return (
     <div className="emotif-div bg-gray-100 p-6 relative">
@@ -93,8 +187,8 @@ export default function Home() {
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
           >
             <div className="bg-white p-6 rounded-lg shadow-lg text-center w-96">
-              <h2 className="text-lg font-bold mb-2">Emotion Submitted!</h2>
-              <p className="text-gray-600">You feel {emotionLevels[sliderValue - 1]} {selectedEmotion}</p>
+              <h2 className="text-lg font-bold mb-2">Emotif AI Notifcation!</h2>
+              <p className="text-gray-600">{modalMessage}</p>
               
               <button
                 onClick={() => setIsModalOpen(false)} // Close modal
