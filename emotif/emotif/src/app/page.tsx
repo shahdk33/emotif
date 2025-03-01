@@ -1,26 +1,28 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Calendar from "./components/Calendar.js";
-import { connectFirebase, addEmotions, getEvents, getAievents } from "../../backend/firebase.js";
 import { motion, AnimatePresence } from "framer-motion"; // Import animation library
 
 export default function Home() {
   const emotionLevels = ["Very minimal", "Just a bit", "Moderate", "Very", "Extremely"];
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [sliderValue, setSliderValue] = useState(2);
-  const [events, setEvents] = useState([]);
-  const [aievents, setAievents] = useState([]);
-  const [suggestedActivities, setSuggestedActivities] = useState([]);
-  const [db, dbRef] = connectFirebase();
-  const [isVisible, setIsVisible] = useState(false); // Controls bar visibility
+  const [isVisible, setIsVisible] = useState(false); // Controls Emotif Bar visibility
+  const [isModalOpen, setIsModalOpen] = useState(false); // Controls pop-up modal visibility
 
-  //function to toggle visibility for the plugin pop up
+  // Toggle Emotif Bar visibility
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
   };
 
+  // Function to show the modal
+  const handleSubmit = () => {
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="emotif-div bg-gray-100 p-6 relative">
+      {/* Logo Button to Toggle Emotif Bar */}
       <div
         onClick={toggleVisibility}
         className="fixed top-4 left-4 cursor-pointer bg-gray-200 p-2 rounded-full shadow-lg z-50"
@@ -70,16 +72,37 @@ export default function Home() {
                   onChange={(e) => setSliderValue(e.target.value)}
                   className="w-full border-black"
                 />
-        
                 <p className="text-center text-gray-600 mt-2">{emotionLevels[sliderValue - 1]}</p>
+
                 <button
-                  onClick={() => alert("Emotion submitted successfully!")}
+                  onClick={handleSubmit} // Open modal instead of alert
                   className="bg-black text-white py-2 px-4 rounded-full hover:bg-gray-800 transition-colors mt-4"
                 >
                   Submit
                 </button>
               </div>
             )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Pop-Up Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          >
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center w-96">
+              <h2 className="text-lg font-bold mb-2">Emotion Submitted!</h2>
+              <p className="text-gray-600">You feel {emotionLevels[sliderValue - 1]} {selectedEmotion}</p>
+              
+              <button
+                onClick={() => setIsModalOpen(false)} // Close modal
+                className="mt-4 bg-black text-white py-2 px-4 rounded-full hover:bg-gray-800 transition-colors"
+              >
+                Close
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
