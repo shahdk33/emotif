@@ -76,7 +76,7 @@ const Calendar = () => {
 
 
   return (
-    <div className="bg-white rounded-lg shadow-md">
+    <div className="bg-white rounded-lg shadow-md m-4">
       <header className="flex items-center p-4">
         <h1 className="ml-4 text-2xl font-semibold text-gray-700">Teams Calendar</h1>
         <div className="flex-grow" />
