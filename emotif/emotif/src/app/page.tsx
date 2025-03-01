@@ -4,6 +4,7 @@ import Calendar from "./components/Calendar.js";
 import { connectFirebase, addEmotions, getEvents, getAievents } from "../../backend/firebase.js";
 
 export default function Home() {
+  const emotionLevels = ["Very minimal", "Just a bit", "Moderate", "Very", "Extremely"];
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [sliderValue, setSliderValue] = useState(2);
   const [events, setEvents] = useState([]); // State to store events
@@ -80,6 +81,7 @@ export default function Home() {
       }]
     };
 
+
     // Make a POST request to askGemeni API
     try {
       const response = await fetch('/api/askGemeni', {
@@ -111,26 +113,28 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-gray-100 p-6">
-      <div className="mx-auto bg-white rounded-lg p-6 shadow-lg w-100">
-        <h1 className="text-4xl text-center font-bold text-gray-800 mb-4">
-          Emotif
-        </h1>
-        <p className="text-center text-gray-600">HOW ARE YOU FEELING RIGHT NOW? </p>
+
+    
+    <div className="emotif-div bg-gray-100 p-6">
+      <div className="mx-auto bg-white rounded-lg p-6 shadow-lg w-[50%] h-auto mb-6">
+        <p className="text-center text-gray-600"> 
+        <img src="/emoji/logo.jpg" alt="Logo" className="h-12 w-auto" />
+        
+        HOW ARE YOU FEELING RIGHT NOW? </p>
         {/* Emotion Buttons */}
-        <div className="flex justify-center gap-2 my-6">
+        <div className="flex justify-center gap-4 my-6">
           {["happy", "anxious", "confident", "angry", "tired"].map((emotion) => (
             <div key={emotion} className="flex flex-col items-center">
               {/* Emotion Icon above the button */}
               <img
                 src={`/emoji/${emotion}-icon.png`} // Corrected relative path for the emoji icon
                 alt={emotion}
-                className="w-32 h-32 mb-4" // Adjust the size of the icon (larger)
+                className="w-20 h-20 mb-2" // Adjust the size of the icon (larger)
               />
               {/* Emotion Button */}
               <button
                 onClick={() => handleEmotionClick(emotion)}
-                className=" emotion-button border border-black text-gray-800 py-1 px-6 rounded-full shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105"
+                className=" emotion-button border border-black text-gray-800 px-6 rounded-full shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105"
               >
                 {/* Emotion Label */}
                 <span className="text-sm">{emotion.charAt(0).toUpperCase() + emotion.slice(1)}</span>
@@ -160,31 +164,8 @@ export default function Home() {
               className="w-full border-black"
             />
             <p id="percentageValue" className="text-center text-gray-600 mt-2">
-              {sliderValue}
+            {emotionLevels[sliderValue - 1]}
             </p>
-
-            {/* Emotion Levels */}
-            <div className="mt-4">
-              <ul className="text-sm text-gray-700 text-center">
-                <li>
-                  <span className="font-bold">1:</span> Very minimal
-                </li>
-                <li>
-                  <span className="font-bold">2:</span> Just a little
-                </li>
-                <li>
-                  <span className="font-bold">3:</span> Just right
-                </li>
-                <li>
-                  <span className="font-bold">4:</span> Really{" "}
-                  <span className="italic">{selectedEmotion}</span>
-                </li>
-                <li>
-                  <span className="font-bold">5:</span> Extremely{" "}
-                  <span className="italic">{selectedEmotion}</span>
-                </li>
-              </ul>
-            </div>
 
             {/* Submit Button */}
             <button
