@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Calendar from "./components/Calendar.js";
 import { motion, AnimatePresence } from "framer-motion"; // Import animation library
-import { connectFirebase, addEmotions, getEvents, getAievents } from "../../backend/firebase.js";
+import { connectFirebase, addEmotions, getEvents, getAievents, addAievents } from "../../backend/firebase.js";
 
 export default function Home() {
   const emotionLevels = ["Very minimal", "Just a bit", "Moderate", "Very", "Extremely"];
@@ -55,10 +55,29 @@ export default function Home() {
       });
 
       const result = await response.json();
-      console.log("RESULT", result.suggestedActivities);
+
+      console.log(result.suggestedActivities);
 
       if (response.ok) {
-        setSuggestedActivities(result.suggestedActivities); // Set suggested activities        setSuggestedActivities(result.suggestedActivities); // Set suggested activities
+
+        console.log("suggested activities", JSON.parse(result.suggestedActivities))
+
+        //parse to json
+        const aiSuggstion = JSON.parse(result.suggestedActivities);
+        console.log("date", aiSuggstion[0].date);
+
+        //getting the data
+        const AIdata = {
+          date: aiSuggstion[0].date,
+          endtime: aiSuggstion[0].endtime,
+          name: aiSuggstion[0].name,
+          starttime: aiSuggstion[0].starttime
+        };
+
+        //add the AI event suggestion data
+        addAievents(db, AIdata)
+ 
+
       } else {
         setModalMessage('Error: ' + result.error);
         setIsModalOpen(true);
@@ -66,6 +85,7 @@ export default function Home() {
     } catch (error) {
       console.error('Error calling askGemeni API:', error);
     }
+
 
     // Fetch and log AI events from Firebase after submission
     fetchAievents();
@@ -91,27 +111,35 @@ export default function Home() {
     }
   };
 
-  // Fetch AI events from Firebase
   const fetchAievents = async () => {
     try {
       const aieventsData = await getAievents(dbRef); // Fetch AI events from Firebase
       console.log('Fetched AI Events:', aieventsData); // Log AI events in console
+      
+      // Check if data is available
       if (aieventsData !== "No data available") {
         setAievents(aieventsData); // Update AI events state
       }
-      const validAievents = aieventsData.filter(event => event !== null); // Remove null events
-      validAievents.forEach(event => {
-        // Alert with event details: name, date, starttime, and endtime
-        setModalMessage(`Emotif AI recommends you do "${event.name}" on ${event.date} from ${event.starttime} to ${event.endtime}`);
+      
+      //change the object to an array and filter out null events
+      const aieventsArray = Object.values(aieventsData); // Convert object to array
+      const validAievents = aieventsArray.filter(event => event !== null); // Remove null events
+      
+      //if there are valid events, set the modal message for the first event
+      if (validAievents.length > 0) {
+        const firstEvent = validAievents[0]; //get the first valid event
+        setModalMessage(`${firstEvent.name} on ${firstEvent.date} from ${firstEvent.starttime} to ${firstEvent.endtime}`);
         setIsModalOpen(true);
-      });    } catch (error) {
-      console.error('Error fetching AI events:', error); // Handle errors
-
+      }
+      
+    } catch (error) {
+      console.error('Error fetching AI events:', error); 
     }
   };
+  
 
   useEffect(() => {
-    fetchEvents(); // Fetch events when component mounts
+    fetchEvents(); //fetch events when component mounts
   }, []);
 
   return (
