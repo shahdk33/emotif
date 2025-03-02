@@ -128,7 +128,16 @@ export default function Home() {
       //if there are valid events, set the modal message for the first event
       if (validAievents.length > 0) {
         const firstEvent = validAievents[0]; //get the first valid event
-        setModalMessage(`${firstEvent.name} on ${firstEvent.date} from ${firstEvent.starttime} to ${firstEvent.endtime}`);
+
+
+        //format the date
+        const date = new Date(firstEvent.date);
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const formattedDate = date.toLocaleDateString('en-US', options);
+
+        //TODO: format the time 12hour
+
+        setModalMessage(`${firstEvent.name} on ${formattedDate} from ${firstEvent.starttime} to ${firstEvent.endtime}`);
         setIsModalOpen(true);
       }
       
