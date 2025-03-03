@@ -11,11 +11,13 @@ import {
   setHours,
   setMinutes,
 } from 'date-fns';
-import { connectFirebase, getEvents } from '../../../backend/firebase.js';
+import { connectFirebase, getEvents, getAievents,addEvents, removeAievent } from '../../../backend/firebase.js';
 
 const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState([]);
+  const [aievents, setAIEvents] = useState([]);
+  const [db, dbRef] = connectFirebase();
 
   const startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 0 });
   const endOfCurrentWeek = endOfWeek(currentDate, { weekStartsOn: 0 });
@@ -43,6 +45,25 @@ const Calendar = () => {
     fetchEvents();
   }, [currentDate]);
 
+  useEffect(() => {
+    const fetchAIEvents = async () => {
+      const [db, dbRef] = connectFirebase();
+      try {
+        const eventsData = await getAievents(dbRef);
+        if (eventsData !== "No data available") {
+          const parsedEvents = JSON.parse(eventsData).filter(event => event !== null);
+          setAIEvents(parsedEvents);
+          console.log(parsedEvents);
+        }
+      } catch (error) {
+        console.error('Error fetching ai events:', error);
+      }
+    };
+
+    fetchAIEvents();
+  });
+
+
   const parseDate = (dateString) => {
     const [day, month, year] = dateString.split('-');
     return new Date(`${month}-${day}-${year}`);
@@ -63,15 +84,23 @@ const Calendar = () => {
       const isWithinFirstHour = eventStartTime <= currentHourEnd && eventStartTime >= currentHourStart;
       return isWithinFirstHour;
   };
-
-  const endsthishour = (event, hour) => {
-    // Check if the event ends within the current hour
-    const eventEndTime = setMinutes(setHours(new Date(), ...event.endtime.split(':').map(Number)), 59);
+  const endsthishour = (event, hour)=>{
+    // Check if the event starts within the current hour
+    const eventEndTime = setMinutes(setHours(new Date(), ...event.endtime.split(':').map(Number)), 0);
     // Create a date object for the hour being checked
     const currentHourStart = setMinutes(setHours(new Date(), hour), 0);
     const currentHourEnd = setMinutes(setHours(new Date(), hour), 59);
-    const isWithinEndHour = eventEndTime <= currentHourEnd && eventEndTime >= currentHourStart;
-    return isWithinEndHour;
+    const isWithinLastHour = eventEndTime <= currentHourEnd && eventEndTime >= currentHourStart;
+    return isWithinLastHour;
+};
+  const addToCaldender = (event, hour)=>{
+  // Check if the event starts within the current hour
+  const eventEndTime = setMinutes(setHours(new Date(), ...event.endtime.split(':').map(Number)), 0);
+  // Create a date object for the hour being checked
+  const currentHourStart = setMinutes(setHours(new Date(), hour), 0);
+  const currentHourEnd = setMinutes(setHours(new Date(), hour), 59);
+  const isWithinLastHour = eventEndTime <= currentHourEnd && eventEndTime >= currentHourStart;
+  return isWithinLastHour;
 };
 
 
@@ -118,7 +147,36 @@ const Calendar = () => {
                       )}
                     </div>
                   ))}
+                  {aievents.filter(event => format(parseDate(event.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd') && getEventForTimeSlot(event, hour.getHours()))
+                  .map((event, k) => (
+                    <div key={k} className="absolute inset-0 bg-pink-100 text-pink-400 p-2 shadow-lg border-l-4 border-pink-400">
+                      {startsthishour(event, hour.getHours()) && (
+                          <span className="font-semibold">{event.name}</span>
+                      )}
+                      {startsthishour(event, hour.getHours()) && (
+                        <span className="mb-5 bg-white-200"></span>
+                      )}
+                      {
+                        endsthishour(event,hour.getHours()) &&(<button
+                          className="ml-2 px-2 py-1 bg-pink-400 text-white rounded shadow"
+                          onClick={() =>{
+                            addEvents(db,{
+                              date: event.date,
+                              starttime: event.starttime,
+                              endtime: event.endtime,
+                              name: event.name,
+                            });
+                            removeAievent(db, event.name,event.date,event.starttime, event.endtime)
+                          }
+                        }
+                        >
+                          Add to Calendar
+                        </button>)
+                      }
+                    </div>
+                  ))}
               </div>
+          
             ))}
           </React.Fragment>
         ))}

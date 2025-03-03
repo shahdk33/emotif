@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 const { initializeApp } = require("firebase/app");
-const { getDatabase, ref, child, get, push, set } = require("firebase/database");
+const { getDatabase, ref, child, get, push, set, remove} = require("firebase/database");
 
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -27,7 +27,8 @@ function connectFirebase() {
     return get(child(dbRef, `events/`)) // Return the promise from `get`
       .then((snapshot) => {
         if (snapshot.exists()) {
-          return JSON.stringify(snapshot.val()); // Return the data if exists
+          console.log(JSON.stringify(snapshot.val()));
+          return JSON.stringify(Object.values(snapshot.val())); // Return the data if exists
         } else {
           return "No data available"; // Return a message if no data is available
         }
@@ -53,14 +54,15 @@ function getAievents(dbRef){
   return get(child(dbRef, `aievents/`)) // Return the promise directly
     .then((snapshot) => {
       if (snapshot.exists()) {
-        return snapshot.val(); // Return the data directly (no need to stringify)
+        console.log(JSON.stringify(Object.values(snapshot.val())));
+        return JSON.stringify(Object.values(snapshot.val()));  // Return the data directly (no need to stringify)
       } else {
         return "No data available"; // Return a message if no data is available
       }
     })
     .catch((error) => {
-      console.error("Error fetching AI events:", error); // Log the error
-      throw error; // Throw the error so it can be handled in the calling function
+      console.error("Error fetching ai events:", error); // Log the error
+      return error; // Return the error message
     });
 }
 function addEmotions(db, emotion){
@@ -99,6 +101,47 @@ function addAievents(db,aievent){
     set(newAievents, aievent);
     
 }
+function removeAievent(db, name, date, starttime, endtime) {
+  const dbRef = ref(db); // Database reference
+
+  return get(child(dbRef, "aievents/")) // Return the promise directly
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        const events = snapshot.val();
+        let eventIdToDelete = null;
+
+        // Loop through events and find a match
+        Object.keys(events).forEach((eventId) => {
+          const event = events[eventId];
+          if (
+            event.name === name &&
+            event.date === date &&
+            event.starttime === starttime &&
+            event.endtime === endtime
+          ) {
+            eventIdToDelete = eventId; // Store the event ID to delete
+          }
+        });
+
+        if (eventIdToDelete) {
+          return remove(ref(db, `aievents/${eventIdToDelete}`))
+            .then(() => `Event "${name}" removed successfully.`)
+            .catch((error) => {
+              console.error("Error deleting event:", error);
+              return error;
+            });
+        } else {
+          return "No matching event found.";
+        }
+      } else {
+        return "No data available";
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching ai events:", error);
+      return error;
+    });
+}
 module.exports = {
   connectFirebase,
   getEvents,
@@ -106,5 +149,6 @@ module.exports = {
   getAievents,
   addEmotions,
   addEvents,
-  addAievents
+  addAievents,
+  removeAievent
 };

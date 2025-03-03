@@ -125,21 +125,21 @@ export default function Home() {
       const aieventsArray = Object.values(aieventsData); // Convert object to array
       const validAievents = aieventsArray.filter(event => event !== null); // Remove null events
       
-      //if there are valid events, set the modal message for the first event
-      if (validAievents.length > 0) {
-        const firstEvent = validAievents[0]; //get the first valid event
+      // //if there are valid events, set the modal message for the first event
+      // if (validAievents.length > 0) {
+      //   const firstEvent = validAievents[0]; //get the first valid event
 
 
-        //format the date
-        const date = new Date(firstEvent.date);
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const formattedDate = date.toLocaleDateString('en-US', options);
+      //   //format the date
+      //   const date = new Date(firstEvent.date);
+      //   const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      //   const formattedDate = date.toLocaleDateString('en-US', options);
 
-        //TODO: format the time 12hour
+      //   //TODO: format the time 12hour
 
-        setModalMessage(`${firstEvent.name} on ${formattedDate} from ${firstEvent.starttime} to ${firstEvent.endtime}`);
-        setIsModalOpen(true);
-      }
+      //   // setModalMessage(`${firstEvent.name} on ${formattedDate} from ${firstEvent.starttime} to ${firstEvent.endtime}`);
+      //   // setIsModalOpen(true);
+      //}
       
     } catch (error) {
       console.error('Error fetching AI events:', error); 
@@ -156,9 +156,12 @@ export default function Home() {
       {/* Logo Button to Toggle Emotif Bar */}
       <div
         onClick={toggleVisibility}
-        className="fixed top-4 left-4 cursor-pointer bg-gray-200 p-2 rounded-full shadow-lg z-50"
+        className="fixed top-4 left-4 cursor-pointer bg-gray-200 p-2 rounded-full shadow-lg z-50 group"
       >
         <img src="/emoji/logo.jpg" alt="Logo" className="h-12 w-auto" />
+        <div className="w-48 absolute left-full top-1/2 ml-3 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-300 text-gray-800 text-sm px-3 py-2 rounded-lg shadow-lg">
+        How do you feel right now?
+        </div>
       </div>
 
       {/* Animated Emotif Bar */}
@@ -224,7 +227,7 @@ export default function Home() {
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
           >
             <div className="bg-white p-6 rounded-lg shadow-lg text-center w-96">
-              <h2 className="text-lg font-bold mb-2">Emotif AI Notifcation!</h2>
+              <h2 className="text-gray-600 text-lg font-bold mb-2">Emotif AI Notifcation!</h2>
               <p className="text-gray-600">{modalMessage}</p>
               
               <button
