@@ -64,7 +64,7 @@ export default function Home() {
 
         //parse to json
         const aiSuggstion = JSON.parse(result.suggestedActivities);
-        console.log("date", aiSuggstion[0].date);
+        // console.log("date", aiSuggstion[0].date);
 
         //getting the data
         const AIdata = {
@@ -156,10 +156,10 @@ export default function Home() {
       {/* Logo Button to Toggle Emotif Bar */}
       <div
         onClick={toggleVisibility}
-        className="fixed top-4 left-4 cursor-pointer bg-gray-200 p-2 rounded-full shadow-lg z-50 group"
+        className="fixed bottom-4 right-4 cursor-pointer bg-gray-200 p-2 rounded-full shadow-lg z-50 group"
       >
         <img src="/emoji/logo.jpg" alt="Logo" className="h-12 w-auto" />
-        <div className="w-48 absolute left-full top-1/2 ml-3 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-300 text-gray-800 text-sm px-3 py-2 rounded-lg shadow-lg">
+        <div className="w-48 absolute right-full top-1/2 ml-3 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-300 text-gray-800 text-sm px-3 py-2 rounded-lg shadow-lg">
         How do you feel right now?
         </div>
       </div>

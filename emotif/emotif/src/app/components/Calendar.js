@@ -53,7 +53,7 @@ const Calendar = () => {
         if (eventsData !== "No data available") {
           const parsedEvents = JSON.parse(eventsData).filter(event => event !== null);
           setAIEvents(parsedEvents);
-          console.log(parsedEvents);
+          // console.log(parsedEvents);
         }
       } catch (error) {
         console.error('Error fetching ai events:', error);

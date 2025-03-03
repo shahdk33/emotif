@@ -54,7 +54,7 @@ function getAievents(dbRef){
   return get(child(dbRef, `aievents/`)) // Return the promise directly
     .then((snapshot) => {
       if (snapshot.exists()) {
-        console.log(JSON.stringify(Object.values(snapshot.val())));
+        // console.log(JSON.stringify(Object.values(snapshot.val())));
         return JSON.stringify(Object.values(snapshot.val()));  // Return the data directly (no need to stringify)
       } else {
         return "No data available"; // Return a message if no data is available
