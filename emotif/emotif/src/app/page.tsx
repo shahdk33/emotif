@@ -224,7 +224,7 @@ export default function Home() {
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1001]"
           >
             <div className="bg-white p-6 rounded-lg shadow-lg text-center w-96">
               <h2 className="text-gray-600 text-lg font-bold mb-2">Emotif AI Notifcation!</h2>

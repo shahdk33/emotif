@@ -136,22 +136,34 @@ const Calendar = () => {
             <div className="p-2 text-right font-medium text-gray-500 w-16 text-sm">{format(hour, 'h a')}</div>
             {daysOfWeek.map((day, j) => (
               <div key={j} className="relative p-2 border bg-white hover:bg-blue-50">
-                {events.filter(event => format(parseDate(event.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd') && getEventForTimeSlot(event, hour.getHours()))
-                  .map((event, k) => (
-                    <div key={k} className="absolute inset-0 bg-purple-200 text-purple-800 p-2 shadow-lg border-l-4 border-purple-800">
-                      {startsthishour(event, hour.getHours()) && (
-                          <span className="font-semibold">{event.name}</span>
-                      )}
-                      {startsthishour(event, hour.getHours()) && (
-                        <span className="mb-5 bg-white-200"></span>
-                      )}
-                    </div>
-                  ))}
+{events
+  .filter(event => format(parseDate(event.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd'))
+  .map((event, k) => {
+    const startHour = parseInt(event.starttime.split(':')[0], 10);
+    const endHour = parseInt(event.endtime.split(':')[0], 10);
+    const duration = endHour - startHour + 1; // Number of time slots to span
+
+    if (hour.getHours() === startHour) {
+      return (
+        <div
+          key={k}
+          className={`absolute z-[1000] left-0 w-full bg-purple-200 text-purple-800 p-2 shadow-lg border-l-4 border-purple-800 mt-[-8px]`}
+          style={{
+            height: `${duration * 100}%`,
+          }}
+        >
+          <span className="font-semibold">{event.name}</span>
+        </div>
+      );
+    }
+    return null; // Prevent rendering multiple separate blocks
+  })}
+
                   {aievents.filter(event => format(parseDate(event.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd') && getEventForTimeSlot(event, hour.getHours()))
                   .map((event, k) => (
-                    <div key={k} className="absolute inset-0 bg-pink-100 text-pink-400 p-2 shadow-lg border-l-4 border-pink-400">
-                      {startsthishour(event, hour.getHours()) && (
-                          <span className="font-semibold">{event.name}</span>
+<div key={k} className="absolute inset-0 bg-pink-100 text-pink-400 p-[5px] shadow-lg border-l-4 border-pink-400 text-[12px] whitespace-normal break-words min-h-[50px]">
+{startsthishour(event, hour.getHours()) && (
+                          <span className="font-semibold">✦{event.name}</span>
                       )}
                       {startsthishour(event, hour.getHours()) && (
                         <span className="mb-5 bg-white-200"></span>
