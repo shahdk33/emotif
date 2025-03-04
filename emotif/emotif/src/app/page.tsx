@@ -22,6 +22,7 @@ export default function Home() {
   };
 
   const handleSubmit = async () => {
+    toggleVisibility()
     // Add emotion data to Firebase
     const emotionData = {
       date: new Date().toISOString().split("T")[0], // Current date
@@ -30,18 +31,20 @@ export default function Home() {
       level: sliderValue,
     };
     addEmotions(db, emotionData); // Add emotion data to Firebase
-    setModalMessage("Emotion submitted successfully!");
-    setIsModalOpen(true);
+    // setModalMessage("Emotion submitted successfully!");
+    // setIsModalOpen(true);
 
     // Prepare data to send to askGemeni API
     const data = {
+      aievents:aievents,
       events: events,
       emotions: [{
         date: emotionData.date,
         emotion: emotionData.emotion,
         level: emotionData.level,
         time: emotionData.time
-      }]
+      }],
+
     };
 
     // Make a POST request to askGemeni API
@@ -151,15 +154,19 @@ export default function Home() {
     fetchEvents(); //fetch events when component mounts
   }, []);
 
+  useEffect(() => {
+    fetchAievents(); //fetch events when component mounts
+  }, []);
+
   return (
     <div className="emotif-div bg-gray-100 p-6 relative">
       {/* Logo Button to Toggle Emotif Bar */}
       <div
         onClick={toggleVisibility}
-        className="fixed bottom-4 right-4 cursor-pointer bg-gray-200 p-2 rounded-full shadow-lg z-50 group"
+        className="fixed bottom-16 right-16 cursor-pointer bg-purple-200 rounded-full shadow-lg z-50 group"
       >
-        <img src="/emoji/logo.jpg" alt="Logo" className="h-12 w-auto" />
-        <div className="w-48 absolute right-full top-1/2 ml-3 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-300 text-gray-800 text-sm px-3 py-2 rounded-lg shadow-lg">
+        <img src="/emoji/happy-logo.png" alt="Logo" className="h-16" />
+        <div className="w-48 absolute right-full top-1/4 ml-3 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-300 text-gray-800 text-sm px-3 py-2 rounded-lg shadow-lg">
         How do you feel right now?
         </div>
       </div>
@@ -168,11 +175,11 @@ export default function Home() {
       <AnimatePresence>
         {isVisible && (
           <motion.div
-            initial={{ y: -100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -100, opacity: 0 }}
+            initial={{ y: 0, opacity: 0 }}
+            animate={{ y: -10, opacity: 1 }}
+            exit={{ y: 10, opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="mx-auto bg-white rounded-lg p-6 shadow-lg w-[50%] h-auto mb-6"
+            className="mx-auto bg-white rounded-lg p-6 shadow-lg  h-auto mb-6 fixed bottom-14 right-32 cursor-pointer bg-purple-200 rounded-full shadow-lg z-[9999] group border-2 border-purple-500"
           >
             <p className="text-center text-gray-600">HOW ARE YOU FEELING RIGHT NOW?</p>
 

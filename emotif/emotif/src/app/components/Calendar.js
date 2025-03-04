@@ -105,8 +105,9 @@ const Calendar = () => {
 
 
   return (
-    <div className="bg-white rounded-lg shadow-md m-4">
+    <div className="bg-white rounded-lg shadow-md m-4 pb-10">
       <header className="flex items-center p-4">
+        <img src="/emoji/logo-transparent.png" alt="Logo" className="h-12 w-auto" />
         <h1 className="ml-4 text-2xl font-semibold text-gray-700">Teams Calendar</h1>
         <div className="flex-grow" />
         <button className="px-4 py-2 mx-5 bg-white-600 text-gray-600 rounded-md border">Meet Now</button>
